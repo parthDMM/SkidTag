@@ -292,9 +292,9 @@
   }
 
   function computeInventoryCode(size, type, weight){
-    return (String(size)+String(type)+String(weight))
-      .toUpperCase()
-      .replace(/[^A-Z0-9]/g, '');
+    return (String(size) + String(type) + String(weight))
+        .toUpperCase()
+        .replace(/[^A-Z0-9.]/g, ''); // allow decimal points
   }
 
   function generatePreview(){
