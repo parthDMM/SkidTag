@@ -292,7 +292,13 @@
   }
 
   function computeInventoryCode(size, type, weight){
-    return (String(size) + String(type) + String(weight))
+    // take first 3 letters of each word in Paper Type
+    const typeCode = String(type || '')
+      .split(/\s+/)             // split by spaces
+      .map(word => word.substring(0,3).toUpperCase()) // first 3 letters uppercase
+      .join('');
+
+    return (String(size) + typeCode + String(weight))
         .toUpperCase()
         .replace(/[^A-Z0-9.]/g, ''); // allow decimal points
   }
@@ -315,12 +321,18 @@
     els.outQuantity.textContent = qty;
     els.outInventoryCode.textContent = code;
 
+    // Flexible barcode width
+    const baseWidth = 1;      // minimum width per bar
+    const charCount = code.length || 1;
+    const maxWidthPerBar = 2; // maximum width per bar
+    const dynamicWidth = Math.min(3, Math.max(1, 120 / code.length)); // adjust maxWidth or 120 as needed
+   
     JsBarcode(els.barcode, code || ' ', {
       format: 'CODE128',
       displayValue: true,
       fontSize: 14,
       height: 64,
-      width: 1.4,
+      width: dynamicWidth,
       margin: 8
     });
 
@@ -405,7 +417,7 @@
     let barcodeBottomY = 0;
     try {
       const dataUrl = await svgToPngDataUrl(els.barcode, 4);
-      const bw = 6.5, bh = 2.0; // larger barcode
+      const bw = 9.5, bh = 2.0; // larger barcode
       const bx = (pageW - bw) / 2;
       const by = (pageH - bh) / 2 + 0.5;
       doc.addImage(dataUrl, 'PNG', bx, by, bw, bh);
